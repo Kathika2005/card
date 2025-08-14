@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Love Card — Open Me 💌</title>
+<style>
+:root {
+  --bg: #1a0b1e;
+  --card: #24142b;
+  --accent: #ff80b5;
+  --muted: #e3c9e7;
+  font-family: 'Poppins', sans-serif;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  background: radial-gradient(ellipse at bottom, #2a1440 0%, #110018 70%);
+  color: var(--muted);
+  overflow-x: hidden;
+}
+.scene {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+.stars {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(white 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: .12;
+  filter: blur(.4px);
+  pointer-events: none;
+}
+.card {
+  width: 380px;
+  max-width: 92vw;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(2, 6, 23, .6);
+  border: 1px solid rgba(255, 255, 255, .08);
+  text-align: center;
+}
+.cover {
+  text-align: center;
+}
+.heart {
+  width: 110px;
+  height: 110px;
+  background: radial-gradient(circle, #ff99cc, #ff4d94);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 30px rgba(255, 100, 160, .6);
+  margin: 0 auto 12px;
+  animation: heartbeat 1.5s infinite, glowPulse 3s ease-in-out infinite;
+}
+.heart::after {
+  content: '❤';
+  font-size: 44px;
+  color: white;
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.05); }
+}
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(255, 100, 160, .6); }
+  50% { box-shadow: 0 0 50px rgba(255, 150, 200, 1); }
+}
+h1 {
+  margin: 0;
+  font-size: 18px;
+  color: white;
+}
+p.lead {
+  margin: 0;
+  font-size: 13px;
+}
+button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, .15);
+  padding: 8px 14px;
+  border-radius: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+button:hover {
+  background: rgba(255,255,255,0.08);
+}
+.inside {
+  display: none;
+  margin-top: 12px;
+}
+.reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.reason {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 14px;
+  text-align: left;
+}
+.photo {
+  width: 100%;
+  border-radius: 12px;
+  display: none;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.fade-in {
+  animation: fadeIn 1s ease forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+.final-message {
+  display: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff80b5;
+  margin-top: 15px;
+  animation: fadeIn 1s ease forwards, glowPulse 2s ease-in-out infinite;
+}
+.footer {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.scene {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+#confettiCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+.heart-float {
+  position: fixed;
+  font-size: 20px;
+  animation: floatUp 5s linear infinite;
+}
+@keyframes floatUp {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100vh); opacity: 0; }
+}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<canvas id="confettiCanvas"></canvas>
+
+<div class="scene">
+  <div class="card">
+    <div class="cover">
+      <div class="heart"></div>
+      <h1>In the galaxy of my life…</h1>
+      <p class="lead">...you shine the brightest. Ready to open?</p>
+      <button id="openBtn">Open Card</button>
+    </div>
+
+    <div class="inside" id="inside">
+      <img id="lovePhoto" src="picss.jpg" alt="Our Photo" class="photo" width="400px"height="400px"/>
+      <div class="reasons" id="reasons"></div>
+      <div class="final-message" id="finalMessage">You are my forever ❤️</div>
+      <div class="footer"><small><b>Made with ❤️ for my Chikku</b></small></div>
+    </div>
+  </div>
+</div>
+
+<audio id="bgMusic" src="song.mp3" loop></audio>
+
+<script>
+const openBtn = document.getElementById('openBtn');
+const inside = document.getElementById('inside');
+const confettiCanvas = document.getElementById('confettiCanvas');
+const reasonsEl = document.getElementById('reasons');
+const music = document.getElementById('bgMusic');
+const photo = document.getElementById('lovePhoto');
+const finalMessage = document.getElementById('finalMessage');
+
+const reasonsList = [
+  "You’re my favorite notification.",
+  "You listen to every little thing I say.",
+  "You always believe in me.",
+  "Every love song is suddenly about you.",
+  "You are my today and all of my tomorrows.",
+  "You send me random sweet messages.",
+  "You make even boring days fun.",
+  "I still get butterflies every time I see you.",
+  "You’re my safe place.",
+  "You love me for who I am."
+];
+
+// Open card sequence
+  openBtn.addEventListener('click', () => {
+  document.querySelector('.scene').style.display = 'block'; // stack items vertically
+  inside.style.display = 'block';
+  openBtn.style.display = 'none';
+  photo.style.display = 'block';
+  photo.classList.add('fade-in');
+  music.play().catch(err => console.log("Autoplay blocked:", err));
+  playConfetti();
+  typeReasons();
+});
+
+function typeReasons() {
+  let index = 0;
+  function typeNext() {
+    if (index < reasonsList.length) {
+      addReason(reasonsList[index]);
+      index++;
+      setTimeout(typeNext, 800);
+    } else {
+      setTimeout(showFinalMessage, 1000);
+    }
+  }
+  typeNext();
+}
+
+function addReason(text) {
+  const div = document.createElement('div');
+  div.className = 'reason fade-in';
+  div.textContent = text;
+  reasonsEl.appendChild(div);
+}
+
+function showFinalMessage() {
+  finalMessage.style.display = 'block';
+  finalMessage.classList.add('fade-in');
+  playConfetti(true);
+}
+
+// Confetti animation
+function playConfetti(golden = false) {
+  const ctx = confettiCanvas.getContext('2d');
+  const DPR = window.devicePixelRatio || 1;
+  function resize() {
+    confettiCanvas.width = window.innerWidth * DPR;
+    confettiCanvas.height = window.innerHeight * DPR;
+    confettiCanvas.style.width = window.innerWidth + 'px';
+    confettiCanvas.style.height = window.innerHeight + 'px';
+    ctx.scale(DPR, DPR);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const particles = [];
+  for (let i = 0; i < 150; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth,
+      y: -20 - Math.random() * 300,
+      vx: (Math.random() - 0.5) * 3,
+      vy: 2 + Math.random() * 4,
+      size: 6 + Math.random() * 8,
+      rot: Math.random() * 360,
+      color: golden 
+        ? `hsl(${40 + Math.random() * 20}, 80%, ${50 + Math.random() * 20}%)`
+        : `hsl(${Math.floor(Math.random() * 360)},70%,60%)`
+    });
+  }
+
+  let running = true;
+  function frame() {
+    if (!running) return;
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.06;
+      p.rot += 4;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      ctx.restore();
+    });
+    if (particles.every(p => p.y > window.innerHeight + 50)) {
+      running = false;
+      setTimeout(() => { ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height); }, 300);
+    } else requestAnimationFrame(frame);
+  }
+  frame();
+}
+
+// Floating hearts
+function createFloatingHeart() {
+  const heart = document.createElement('div');
+  heart.className = 'heart-float';
+  heart.textContent = '💖';
+  heart.style.left = Math.random() * 100 + 'vw';
+  heart.style.top = '100vh';
+  heart.style.fontSize = (16 + Math.random() * 24) + 'px';
+  document.body.appendChild(heart);
+  setTimeout(() => heart.remove(), 5000);
+}
+setInterval(createFloatingHeart, 1000);
+</script>
+</body>
+</html>
